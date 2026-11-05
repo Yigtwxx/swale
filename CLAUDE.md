@@ -29,7 +29,7 @@ The website hosts a landing page and a community that shares **recipes**
 - **ML:** ONNX Runtime via `ort`. Execution-provider order: CUDA → DirectML →
   CoreML → CPU. Local VLM through Ollama; optional BYOK Claude / Gemini.
 - **Web:** Next.js on Vercel (later under `<personal-domain>/projects/swale`),
-  MongoDB Atlas, S3-compatible storage for thumbnails only.
+  MongoDB Atlas, Backblaze B2 (S3-compatible) for thumbnails only.
 - **Python:** development only (ONNX export, experiments). Never shipped.
 
 ## Planned layout

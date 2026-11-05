@@ -53,7 +53,7 @@ libmpv. Both decode on the GPU, so a 4K loop costs very little.
 | Windows player | Rust + libmpv |
 | Media | yt-dlp, ffmpeg |
 | ML | ONNX Runtime (CLIP and aesthetic scoring), Ollama for local VLMs |
-| Website & community | Next.js on Vercel, MongoDB Atlas, S3-compatible storage |
+| Website & community | Next.js on Vercel, MongoDB Atlas, Backblaze B2 |
 
 Details and trade-offs are in [docs/DESIGN.md](docs/DESIGN.md).
 

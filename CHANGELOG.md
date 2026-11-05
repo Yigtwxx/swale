@@ -13,3 +13,9 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   log.
 - Project scaffolding: README, MIT license, contributing guide, code of
   conduct, security policy, issue and pull request templates.
+- `.github/FUNDING.yml`, which adds the GitHub Sponsors button.
+
+### Changed
+- Design: sign-in is required in the desktop app as well (cached session for
+  offline use). Backblaze B2 chosen for thumbnail storage. GitHub Sponsors
+  recorded.

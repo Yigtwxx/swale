@@ -18,8 +18,9 @@ Principles:
 
 - **Free for users.** Heavy work (download, render, ML) runs on the user's
   machine. No mandatory paid API.
-- **Local-first.** Local features work without network access, except the
-  download step itself.
+- **Local-first.** After the first sign-in, local features keep working
+  without network access (cached session). Only downloads and community
+  features need the network.
 - **Light at rest.** A running wallpaper should cost close to nothing:
   hardware decoding, paused when it is hidden.
 
@@ -211,7 +212,9 @@ Draft (`swale.recipe/v1`):
 
 ## 6. Accounts
 
-- Available on the **website and the desktop app**.
+- **Required** on both the website and the desktop app. The desktop app asks
+  for sign-in on first launch. The session is cached in the OS keychain, so the
+  app keeps working offline and refreshes the session once it is back online.
 - Sign-in methods: **email + password**, **GitHub**, **Google**.
 - Passwords are hashed with Argon2id (or scrypt) and are never stored or logged
   in plain text. Email verification, password reset, and rate-limited login
@@ -248,14 +251,18 @@ Backend:
 
 - **Database:** MongoDB Atlas (free M0 tier, 512 MB). Recipes are documents,
   so the document model fits.
-- **Object storage (thumbnails only):** an S3-compatible free tier. Cloudflare
-  R2's free tier is already used by another project. Candidate: Backblaze B2
-  (10 GB free). At about 50 KB per thumbnail, 10 GB is roughly 200,000 recipes.
+- **Object storage (thumbnails only):** **Backblaze B2**, chosen because
+  Cloudflare R2's free tier is already used by another project. B2 is
+  S3-compatible and comes from a separate company (not part of Cloudflare). The first 10 GB are
+  always free, egress is free up to 3× the stored data each month, and
+  downloads served through Cloudflare's CDN are free (Bandwidth Alliance). At
+  about 50 KB per thumbnail, 10 GB is roughly 200,000 recipes.
 - Move to paid tiers when traffic needs it. S3 compatibility keeps that
   migration simple.
 - **Moderation:** report button, NSFW classifier on uploaded thumbnails, rate
   limits.
-- **Donations:** GitHub Sponsors and/or Ko-fi.
+- **Donations:** [GitHub Sponsors](https://github.com/sponsors/Yigtwxx). The
+  repository's Sponsor button comes from `.github/FUNDING.yml`.
 
 ## 8. Distribution
 
@@ -311,9 +318,6 @@ Later: Discover.
 
 ## 13. Open questions
 
-- Is sign-in optional in the desktop app, with local features working while
-  signed out? Proposed: yes.
-- Object storage: Backblaze B2 or another free tier?
 - Auth library: Better Auth or Auth.js?
 - UI components: shadcn/ui proposed.
 
@@ -336,8 +340,10 @@ All entries dated 2026-11-05.
 - Name: Swale.
 - Community shares recipes only.
 - Accounts: email + password, GitHub, Google, on both web and desktop.
-- Web database: MongoDB. Object storage: not Cloudflare R2 (its free tier is
-  already in use).
+  Sign-in is required in the desktop app too, with a cached session for
+  offline use.
+- Web database: MongoDB Atlas. Object storage: Backblaze B2, thumbnails only
+  (Cloudflare R2's free tier is already in use).
 - Desktop database: SQLite, embedded in the app.
 - Website: Vercel first, later `<personal-domain>/projects/swale`.
-- Donations: yes.
+- Donations: GitHub Sponsors.
