@@ -12,9 +12,10 @@
 
 ## What it will do
 
-- **Clip to wallpaper.** Paste a YouTube link, pick a range (say `1:10`–`1:20`)
-  and a quality from 1080p to 4K. Swale downloads only that range, fits it to
-  your screen and loops it on your desktop.
+- **Clip to wallpaper.** Paste a link (YouTube or any site `yt-dlp` supports)
+  or drop in your own video, pick a range of up to 30 seconds (say
+  `1:10`–`1:20`) and a quality from 1080p to 4K. Swale downloads only that
+  range, fits it to your screen and loops it on your desktop.
 - **Stills too.** Use your own images or grab a single frame from a video.
   Static wallpapers are set through the OS, so nothing keeps running in the
   background.
@@ -56,6 +57,11 @@ libmpv. Both decode on the GPU, so a 4K loop costs very little.
 | Website & community | Next.js on Vercel, MongoDB Atlas, Backblaze B2 |
 
 Details and trade-offs are in [docs/DESIGN.md](docs/DESIGN.md).
+
+## Requirements (planned)
+
+- macOS 14 or later on Apple Silicon
+- Windows 11
 
 ## Roadmap
 

@@ -19,3 +19,9 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Design: sign-in is required in the desktop app as well (cached session for
   offline use). Backblaze B2 chosen for thumbnail storage. GitHub Sponsors
   recorded.
+- Design: product details settled. Covers sources (YouTube, other `yt-dlp`
+  sites, local files), 30 s clips, optional audio, menu bar / tray presence,
+  launch at login, battery and theme settings, macOS 14+ (Apple Silicon) and
+  Windows 11, Turkish and English, community likes / follows / collections,
+  public or unlisted recipes, opt-in crash reports, background updates and a
+  relocatable library.

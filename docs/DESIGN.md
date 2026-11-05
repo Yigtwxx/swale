@@ -26,9 +26,12 @@ Principles:
 
 ## 2. Core flow (v1)
 
-1. The user enters a YouTube URL, a start and end time, and a quality
-   (1080p / 1440p / 2160p / best available).
-2. `yt-dlp` downloads only that range (`--download-sections "*1:10-1:20"`).
+1. The user picks a source, a start and end time (at most **30 s**), and a
+   quality (1080p / 1440p / 2160p / best available). Sources: YouTube, any
+   other site `yt-dlp` supports (TikTok, Instagram, X, Vimeo, …), or a local
+   video file (MP4, MOV, MKV).
+2. For links, `yt-dlp` downloads only that range
+   (`--download-sections "*1:10-1:20"`). Local files skip this step.
 3. `ffmpeg` crops and scales it to the target display, makes the loop seamless
    (crossfade or ping-pong) and encodes an MP4.
 4. The item lands in the library. One click applies it.
@@ -38,6 +41,9 @@ Formats:
 - Wallpapers are stored as **MP4**. H.264 by default (plays everywhere,
   including Windows machines without the HEVC extension); HEVC is optional on
   macOS.
+- **Audio is optional.** A "keep audio" toggle at creation (off by default)
+  keeps the track (AAC) in the MP4, and each library item has a mute switch.
+  Playback always starts muted.
 - **GIF is not used for wallpapers.** It is limited to 256 colors, very large
   at 4K, and decoded on the CPU. GIF exists only as a low-resolution export for
   sharing.
@@ -108,6 +114,28 @@ color grading and beat-aware timing. Not just a cut-down highlight reel.
 
 In-app browsing of free wallpaper sources such as Wallhaven.
 
+### 3.6 App behavior and settings
+
+- **Presence:** a menu bar icon on macOS and a system tray icon on Windows,
+  plus a library window. Closing the window keeps the wallpaper running.
+- **Launch at login:** on by default, and it restores each display's
+  wallpaper. Can be turned off in settings.
+- **Battery:** a setting with three choices: pause on battery (default), play
+  a low-resolution proxy, or keep playing. Playback always pauses while a
+  fullscreen app covers the display.
+- **Theme:** System / Light / Dark, chosen by the user.
+- **Languages:** Turkish and English in the app and on the website from day
+  one. Strings live in translation files.
+- **Storage:** the library starts in the default app folder and can be moved,
+  for example to an external disk. Settings show disk usage and a "clear
+  cache" button.
+- **Updates:** downloaded in the background and installed on the next restart,
+  with a small "update ready" notice. Fast delivery matters because `yt-dlp`
+  breaks when YouTube changes.
+- **Crash reports:** opt-in only. After a crash the app asks before sending a
+  report, and reports contain no personal data or file names. No usage
+  analytics.
+
 ## 4. Desktop architecture
 
 | Layer | macOS | Windows | Language |
@@ -121,6 +149,9 @@ In-app browsing of free wallpaper sources such as Wallhaven.
 | Upscale / interpolation | `realesrgan-ncnn-vulkan`, `rife-ncnn-vulkan` | same | prebuilt sidecars |
 | Download / encode | `yt-dlp`, `ffmpeg` | same | prebuilt sidecars |
 | Local VLM | Ollama | Ollama | HTTP |
+
+Supported platforms: **macOS 14+ on Apple Silicon** (no Intel builds) and
+**Windows 11**.
 
 Why Tauri: the app runs all day, so Electron's memory cost (~200 MB+) is too
 high. PySide6 packages poorly. Two fully native apps would mean writing
@@ -136,8 +167,8 @@ Platform notes:
   desktop icons and plays through libmpv (LGPL build) with hardware decoding.
   `WorkerW` is undocumented and has broken with Windows updates (24H2), so this
   code stays isolated and gets its own tests.
-- Pause playback when a fullscreen app covers the display, and optionally on
-  battery.
+- Pause playback when a fullscreen app covers the display. Battery behavior
+  follows the user's setting (section 3.6).
 - ML execution-provider order: **CUDA → DirectML → CoreML → CPU** (the ONNX
   equivalent of the CUDA → MPS → CPU rule).
 - Python is used only during development (exporting models to ONNX, scoring
@@ -147,7 +178,8 @@ Platform notes:
 
 SQLite is embedded in the app binary, so there is nothing extra to install.
 The database file is created on first launch. It holds metadata only. Media
-files stay on disk and are never stored as BLOBs.
+files stay on disk and are never stored as BLOBs. The library folder can be
+relocated in settings.
 
 - macOS: `~/Library/Application Support/com.yigtwxx.swale/`
 - Windows: `%APPDATA%\com.yigtwxx.swale\`
@@ -199,12 +231,17 @@ Draft (`swale.recipe/v1`):
   "kind": "video",
   "source": { "type": "youtube", "videoId": "dQw4w9WgXcQ" },
   "range": { "start": 70.0, "end": 80.0 },
-  "output": { "maxHeight": 2160, "fps": 30, "loop": "crossfade" },
+  "output": { "maxHeight": 2160, "fps": 30, "loop": "crossfade", "audio": false },
   "edit": null,
   "meta": { "title": "Neon rain", "tags": ["city", "night"] }
 }
 ```
 
+- `source.type` is `youtube` or `url` (any other site `yt-dlp` supports).
+  Items made from local files keep a `file` source in the library but **cannot
+  be shared**, because nobody else can fetch the file.
+- `range` is at most 30 s. `output.audio` (default `false`) records whether
+  the audio track is kept.
 - Image recipes use `"kind": "image"` with `"at": 72.4` in place of `range`.
 - `edit` is `null` until AI Edit exists. Then it holds the edit plan: preset,
   clips, transitions, grade and effects with timings.
@@ -237,7 +274,10 @@ Pages:
 - **Landing page** (scrolling): hero with a live wallpaper demo, how it works in
   three steps, features, OS-aware download button, FAQ.
 - **Community:** recipe gallery with filters (animated / still, resolution,
-  color, tags), likes, collections, weekly picks.
+  color, tags) and weekly picks. Users can **like** recipes, **follow** other
+  users and **save recipes into collections**. No comments, which avoids a
+  moderation load. A shared recipe is either **public** (listed in the
+  gallery) or **unlisted** (only people with the link can open it).
 - **"Open in Swale":** a `swale://recipe/<id>` link opens the app and adds the
   recipe to the library.
 - Profiles, preset sharing, changelog (from GitHub Releases), help,
@@ -266,11 +306,12 @@ Backend:
 
 ## 8. Distribution
 
-- GitHub Actions (`tauri-action`) builds `.dmg` (macOS arm64 / x64) and
+- GitHub Actions (`tauri-action`) builds `.dmg` (macOS, Apple Silicon) and
   `.msi` / `.exe` (Windows) on every version tag and attaches them to GitHub
   Releases. This is free for public repositories.
 - The website's download button detects the OS and links to the latest release.
-- Auto-update: the Tauri updater plugin, pointed at GitHub Releases.
+- Auto-update: the Tauri updater plugin, pointed at GitHub Releases. Updates
+  download in the background and install on the next restart.
 - Code signing: without an Apple Developer account ($99/year) macOS shows an
   "unidentified developer" warning, and unsigned Windows builds trigger
   SmartScreen. This is acceptable for early open-source releases.
@@ -347,3 +388,15 @@ All entries dated 2026-11-05.
 - Desktop database: SQLite, embedded in the app.
 - Website: Vercel first, later `<personal-domain>/projects/swale`.
 - Donations: GitHub Sponsors.
+- Sources: YouTube, other `yt-dlp` sites and local files. Items made from
+  local files cannot be shared.
+- Clips are at most 30 s. Audio is optional and muted by default.
+- Menu bar / tray app with a library window. Launch at login is on by default.
+- Battery behavior is a setting (default: pause). Theme: System / Light / Dark.
+- Platforms: macOS 14+ on Apple Silicon only, and Windows 11.
+- Languages: Turkish and English.
+- Community: likes, follows and collections, no comments. Recipes are public
+  or unlisted.
+- Crash reports are opt-in only. No analytics.
+- Updates download in the background and install on restart.
+- The library folder can be relocated.

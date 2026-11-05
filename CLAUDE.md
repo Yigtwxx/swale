@@ -20,6 +20,7 @@ The website hosts a landing page and a community that shares **recipes**
 ## Stack (planned)
 
 - **Desktop shell:** Tauri 2. Core in Rust, UI in React + TypeScript.
+  Targets macOS 14+ (Apple Silicon only) and Windows 11.
 - **Local DB:** SQLite (embedded), metadata only; media files on disk.
 - **macOS player:** Swift helper (`AVPlayerLooper`, desktop-level `NSWindow`),
   built with `swiftc` (Xcode is not installed on the maintainer's Mac).
