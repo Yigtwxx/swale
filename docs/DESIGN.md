@@ -136,6 +136,16 @@ In-app browsing of free wallpaper sources such as Wallhaven.
   report, and reports contain no personal data or file names. No usage
   analytics.
 
+### 3.7 First launch
+
+- Sign-in (required), then a **three-step wizard** that can be skipped:
+  language and theme → "make your first wallpaper" (paste a link or drop a
+  file) → done.
+- The installer ships **3–5 sample wallpapers** (animated and still), so the
+  library is never empty on day one. They are our own footage or CC0, with
+  licenses recorded in `assets/samples/LICENSES.md`. This adds about
+  30–50 MB to the installer.
+
 ## 4. Desktop architecture
 
 | Layer | macOS | Windows | Language |
@@ -261,6 +271,12 @@ Draft (`swale.recipe/v1`):
   are kept in the OS keychain.
 - Auth library candidates: Better Auth or Auth.js. Both are TypeScript and both
   support MongoDB.
+- **Username:** a unique `@handle`, 3–20 characters (letters, digits,
+  underscore), case-insensitive, plus a free-form display name. Profile URL:
+  `/u/<handle>`.
+- **Profile:** avatar (taken from GitHub / Google or uploaded, stored small in
+  Backblaze B2), a bio of up to 160 characters, social links, and liked
+  recipes (shown by default, can be hidden).
 
 ## 7. Website & community
 
@@ -291,7 +307,7 @@ Backend:
 
 - **Database:** MongoDB Atlas (free M0 tier, 512 MB). Recipes are documents,
   so the document model fits.
-- **Object storage (thumbnails only):** **Backblaze B2**, chosen because
+- **Object storage (thumbnails and avatars only):** **Backblaze B2**, chosen because
   Cloudflare R2's free tier is already used by another project. B2 is
   S3-compatible and comes from a separate company (not part of Cloudflare). The first 10 GB are
   always free, egress is free up to 3× the stored data each month, and
@@ -299,8 +315,8 @@ Backend:
   about 50 KB per thumbnail, 10 GB is roughly 200,000 recipes.
 - Move to paid tiers when traffic needs it. S3 compatibility keeps that
   migration simple.
-- **Moderation:** report button, NSFW classifier on uploaded thumbnails, rate
-  limits.
+- **Moderation:** report button, NSFW classifier on uploaded thumbnails and
+  avatars, rate limits.
 - **Donations:** [GitHub Sponsors](https://github.com/sponsors/Yigtwxx). The
   repository's Sponsor button comes from `.github/FUNDING.yml`.
 
@@ -383,8 +399,8 @@ All entries dated 2026-11-05.
 - Accounts: email + password, GitHub, Google, on both web and desktop.
   Sign-in is required in the desktop app too, with a cached session for
   offline use.
-- Web database: MongoDB Atlas. Object storage: Backblaze B2, thumbnails only
-  (Cloudflare R2's free tier is already in use).
+- Web database: MongoDB Atlas. Object storage: Backblaze B2, for thumbnails
+  and avatars only (Cloudflare R2's free tier is already in use).
 - Desktop database: SQLite, embedded in the app.
 - Website: Vercel first, later `<personal-domain>/projects/swale`.
 - Donations: GitHub Sponsors.
@@ -400,3 +416,7 @@ All entries dated 2026-11-05.
 - Crash reports are opt-in only. No analytics.
 - Updates download in the background and install on restart.
 - The library folder can be relocated.
+- First launch: sign-in, then a skippable three-step wizard. 3–5 sample
+  wallpapers with clean licenses ship in the installer.
+- Unique `@handle` (3–20 characters) plus a display name. Profile: avatar,
+  bio, social links, liked recipes (can be hidden).

@@ -25,3 +25,5 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   Windows 11, Turkish and English, community likes / follows / collections,
   public or unlisted recipes, opt-in crash reports, background updates and a
   relocatable library.
+- Design: first-launch wizard, bundled sample wallpapers, username and profile
+  rules.
