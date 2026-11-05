@@ -1,0 +1,59 @@
+# --- Secrets (never commit) ---
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+secrets/
+
+# --- OS ---
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# --- Editors ---
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.swp
+
+# --- Node / TypeScript ---
+node_modules/
+dist/
+build/
+.next/
+out/
+coverage/
+*.tsbuildinfo
+npm-debug.log*
+pnpm-debug.log*
+.vercel/
+
+# --- Rust / Tauri ---
+target/
+src-tauri/gen/
+
+# --- Swift ---
+.build/
+*.xcuserstate
+DerivedData/
+
+# --- Python (dev scripts) ---
+__pycache__/
+*.py[cod]
+.venv/
+.ruff_cache/
+.pytest_cache/
+
+# --- Local media, models and sidecar binaries ---
+*.onnx
+models/
+media/
+cache/
+sidecars/bin/
+*.mp4
+*.webm
+*.mkv
+*.gif
+!docs/**/*.gif
